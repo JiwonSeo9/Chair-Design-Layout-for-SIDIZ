@@ -311,6 +311,17 @@ td { padding: 14px 16px; vertical-align: middle; font-size: 14px; }
 .effective-range .eff-label { color: var(--ink3); font-size: 10px; margin-right: 4px; }
 .effective-range .eff-val { font-weight: 500; }
 
+
+/* Product category groups */
+.prod-category { margin-bottom: 16px; }
+.prod-cat-label {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink4);
+  margin-bottom: 7px; display: flex; align-items: center; gap: 8px;
+}
+.prod-cat-label::after { content:''; flex:1; height:1px; background:var(--rule); }
+.prod-cat-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+
 @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 768px) {
   .page { padding: 40px 20px 80px; }
@@ -551,7 +562,7 @@ td { padding: 14px 16px; vertical-align: middle; font-size: 14px; }
       <!-- Product selector -->
       <div style="margin-bottom:24px">
         <div class="input-section-label">제품 선택  /  Product</div>
-        <div id="product-chips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+        <div id="product-chips"></div>
       </div>
 
       <!-- Product result -->
@@ -980,14 +991,42 @@ const PROD_SECTIONS = [
 
 let curProduct = null;
 
+const PRODUCT_CATEGORIES = [
+  { label: 'Work', names: ['T90','T80','T55','T50 Air','T50 HLDA 풀옵션','T50 HF','T50 LIGHT','T50 TAB SQUARE','T20 2세대','T20 1세대'] },
+  { label: 'Light Work', names: ['LINIE','EGA DAILY','EGA 높이조절형 / 바퀴','EGA 높이조절형 / 글라이드','EGA 4-leg형 / 바퀴','EGA 4-leg형 / 글라이드','BUTTON 패브릭 높이조절형 / 바퀴','BUTTON 패브릭 높이조절형 / 글라이드','BUTTON 패브릭 4-leg형 / 바퀴','BUTTON 패브릭 4-leg형 / 글라이드','BUTTON 플라스틱 높이조절형 / 바퀴','BUTTON 플라스틱 높이조절형 / 글라이드','BUTTON 플라스틱 4-leg형 / 바퀴','BUTTON 플라스틱 4-leg형 / 글라이드'] },
+  { label: 'Living · Dining', names: ['MANE 플라스틱','MANE 패브릭','MANE 원목다리 패브릭','MANE 원목다리 플라스틱','OUI'] },
+  { label: 'Gaming', names: ['GC PRO 게이밍','GX'] },
+  { label: 'Study', names: ['IBLE 높이조절형','IBLE','RINGO 2세대','RINGO 1세대','TREVO'] },
+  { label: 'Seat Booster', names: ['PILLO','FUNGUS'] },
+];
+
 function initProductChips(){
   const wrap = document.getElementById('product-chips');
-  PRODUCTS.forEach(p=>{
-    const btn = document.createElement('button');
-    btn.className = 'prod-chip';
-    btn.textContent = p.name;
-    btn.onclick = ()=>selectProduct(p.name);
-    wrap.appendChild(btn);
+  wrap.innerHTML = '';
+  PRODUCT_CATEGORIES.forEach(cat=>{
+    // 카테고리에 속한 제품 중 PRODUCTS에 실제로 있는 것만 필터
+    const validNames = cat.names.filter(n => PRODUCTS.find(p=>p.name===n));
+    if(validNames.length === 0) return;
+
+    const catDiv = document.createElement('div');
+    catDiv.className = 'prod-category';
+
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'prod-cat-label';
+    labelDiv.textContent = cat.label;
+    catDiv.appendChild(labelDiv);
+
+    const chipsDiv = document.createElement('div');
+    chipsDiv.className = 'prod-cat-chips';
+    validNames.forEach(name=>{
+      const btn = document.createElement('button');
+      btn.className = 'prod-chip';
+      btn.textContent = name;
+      btn.onclick = ()=>selectProduct(name);
+      chipsDiv.appendChild(btn);
+    });
+    catDiv.appendChild(chipsDiv);
+    wrap.appendChild(catDiv);
   });
 }
 
